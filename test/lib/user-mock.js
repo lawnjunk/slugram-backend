@@ -1,3 +1,4 @@
+'use strict'
 
 const debug = require('debug')('sulgram:user-mock')
 const User = require('../../model/user.js')
