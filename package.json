@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "4.4.7"
+  },
   "scripts": {
     "start": "node server.js",
-    "test": "./node_modules/mocha/bin/mocha",
+    "test": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",
     "lint": "./node_modules/eslint/bin/eslint.js .",
     "test-debug": "DEBUG=slug* ./node_modules/mocha/bin/mocha"
   },
