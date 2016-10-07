@@ -3,6 +3,7 @@ db
 .env
 data/*
 coverage
+html-report
 # Created by https://www.gitignore.io/api/osx,vim,linux,windows,node
 
 ### OSX ###
