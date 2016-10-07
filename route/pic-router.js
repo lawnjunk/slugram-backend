@@ -29,8 +29,9 @@ const picRouter = module.exports = require('express').Router()
 function s3UploadPromise(params){
   return new Promise((resolve, reject) => {
     s3.upload(params, (err, s3data) => {
-      if (err) return reject(err)
-        resolve(s3data)
+      if (err) 
+        return reject(err)
+      resolve(s3data)
     })
   })
 }
@@ -103,7 +104,7 @@ picRouter.delete('/api/gallery/:galleryID/pic/:picID', bearerAuth, function(req,
     return s3.deleteObject(params).promise()
   })
   .catch(err => err.status ? Promise.reject(err) : Promise.reject(createError(500, err.message)))
-  .then(s3data => {
+  .then(() => {
     return Pic.findByIdAndRemove(req.params.picID)
   })
   .then(() => res.sendStatus(204))

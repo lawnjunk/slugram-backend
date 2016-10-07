@@ -7,7 +7,6 @@ const awsMocks = require('./lib/aws-mocks.js')
 // npm modules
 const expect = require('chai').expect
 const request = require('superagent')
-const debug = require('debug')('slugram:pic-router-test')
 
 // app modules
 const picMock = require('./lib/pic-mock.js')
@@ -43,8 +42,9 @@ describe('testing pic-router', function(){
         .field('desc', examplePic.desc)
         .attach('image', examplePic.image)
         .end((err, res) => {
-          if (err) return done(err)
-            expect(res.status).to.equal(200)
+          if (err) 
+            return done(err)
+          expect(res.status).to.equal(200)
           expect(res.body.name).to.equal(examplePic.name)
           expect(res.body.desc).to.equal(examplePic.desc)
           expect(res.body.galleryID).to.equal(this.tempGallery._id.toString())
@@ -178,7 +178,7 @@ describe('testing pic-router', function(){
       before(done => picMock.call(this, done))
       it('should respond with status 400', done => {
         request.delete(`${url}/api/gallery/${this.tempGallery._id}/pic/${this.tempPic._id}`)
-        .set({Authorization: `lul this is bad`})
+        .set({Authorization: 'lul this is bad'})
         .end((err, res) => {
           expect(res.status).to.equal(400)
           expect(res.text).to.equal('BadRequestError')

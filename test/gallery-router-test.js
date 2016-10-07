@@ -19,7 +19,7 @@ const mockGallery = require('./lib/gallery-mock.js')
 // const
 const url = `http://localhost:${process.env.PORT}`
   // config
-  mongoose.Promise = Promise
+mongoose.Promise = Promise
 let exampleGallery = {
   name: 'beach adventure',
   desc: 'not enough sun screan ouch',

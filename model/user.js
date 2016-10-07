@@ -25,7 +25,7 @@ userSchema.methods.generatePasswordHash = function(password){
   return new Promise((resolve, reject) => {
     bcrypt.hash(password, 10, (err, hash) => {
       if (err) return reject(err) // 500 error
-      this.password = hash;
+      this.password = hash
       resolve(this)
     })
   })
@@ -48,7 +48,7 @@ userSchema.methods.comparePasswordHash = function(password){
 userSchema.methods.generateFindHash = function(){
   debug('generateFindHash')
   return new Promise((resolve, reject) => {
-    let tries = 0;
+    let tries = 0
     _generateFindHash.call(this)
 
     function _generateFindHash(){
