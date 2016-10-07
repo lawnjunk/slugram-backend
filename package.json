@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha -R nyan",
+    "test": "./node_modules/mocha/bin/mocha,
     "lint": "./node_modules/eslint/bin/eslint.js .",
     "test-debug": "DEBUG=slug* ./node_modules/mocha/bin/mocha"
   },
