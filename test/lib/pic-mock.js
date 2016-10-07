@@ -1,3 +1,4 @@
+'use strict'
 
 // npm modules
 const debug = require('debug')('slugram:pic-mock')
