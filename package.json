@@ -1,0 +1,37 @@
+{
+  "name": "basic-auth-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha -R nyan",
+    "test-debug": "DEBUG=slug* ./node_modules/mocha/bin/mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.6.6",
+    "bcrypt": "^0.8.7",
+    "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
+    "cors": "^2.8.1",
+    "debug": "^2.2.0",
+    "del": "^2.2.2",
+    "dotenv": "^2.0.0",
+    "express": "^4.14.0",
+    "http-errors": "^1.5.0",
+    "jsonwebtoken": "^7.1.9",
+    "mongoose": "^4.6.2",
+    "morgan": "^1.7.0",
+    "multer": "^1.2.0"
+  },
+  "devDependencies": {
+    "aws-sdk-mock": "^1.5.0",
+    "chai": "^3.5.0",
+    "form-data": "^2.1.1",
+    "lorem-ipsum": "^1.0.3",
+    "mocha": "^3.1.0",
+    "superagent": "^2.3.0"
+  }
+}
