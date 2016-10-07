@@ -1,21 +1,8 @@
+# slugram ignore 
 db
 .env
 data/*
-
-# Created by https://www.gitignore.io/api/vim,osx,windows,linux,node
-
-### Vim ###
-# swap
-[._]*.s[a-w][a-z]
-[._]s[a-w][a-z]
-# session
-Session.vim
-# temporary
-.netrwhist
-*~
-# auto-generated tag files
-tags
-
+# Created by https://www.gitignore.io/api/osx,vim,linux,windows,node
 
 ### OSX ###
 *.DS_Store
@@ -46,6 +33,35 @@ Temporary Items
 .apdisk
 
 
+### Vim ###
+# swap
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+# session
+Session.vim
+# temporary
+.netrwhist
+*~
+# auto-generated tag files
+tags
+
+
+### Linux ###
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+
 ### Windows ###
 # Windows image file caches
 Thumbs.db
@@ -65,22 +81,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
-
-### Linux ###
-*~
-
-# temporary files which can be created if a process still has a handle open of a deleted file
-.fuse_hidden*
-
-# KDE directory preferences
-.directory
-
-# Linux trash folder which might appear on any partition or disk
-.Trash-*
-
-# .nfs files are created when an open file is removed but is still being accessed
-.nfs*
 
 
 ### Node ###
