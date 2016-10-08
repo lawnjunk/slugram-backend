@@ -29,11 +29,9 @@ const app = express()
 
 // app middleware
 app.use(cors())
-if (process.env.NODE_ENV !== 'testing'){
-  let production = process.env.NODE_ENV === 'production'
-  let morganFormat = production ? 'common' : 'dev'
-  app.use(morgan(morganFormat))
-}
+let production = process.env.NODE_ENV === 'production'
+let morganFormat = production ? 'common' : 'dev'
+app.use(morgan(morganFormat))
 
 // app routes
 app.use(picRouter)
@@ -42,7 +40,7 @@ app.use(galleryRouter)
 app.use(errorMiddleware)
 
 // start server
-const server = module.exports = app.listen(PORT , () => { 
+const server = module.exports = app.listen(PORT , () => {
   debug(`server up on ${PORT}`)
 })
 

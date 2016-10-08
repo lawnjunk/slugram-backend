@@ -211,13 +211,13 @@ describe('test /api/gallery', function(){
       })
 
       it('should return a gallery', done => {
-        request.get(`${url}/api/gallery/${this.tempGallery._id}bad`)
+        request.get(`${url}/api/gallery/${this.tempGallery._id}`)
         .set({
           Authorization: `Bearer ${this.tempToken}`,
         })
         .end((err, res) => {
-          expect(res.status).to.equal(400)
-          expect(res.text).to.equal('BadRequestError')
+          expect(res.status).to.equal(401)
+          expect(res.text).to.equal('UnauthorizedError')
           done()
         })
       })
