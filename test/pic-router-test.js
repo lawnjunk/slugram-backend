@@ -11,8 +11,10 @@ const request = require('superagent')
 // app modules
 const picMock = require('./lib/pic-mock.js')
 const cleanDB = require('./lib/clean-db.js')
-const galleryMock = require('./lib/gallery-mock.js')
+let fuzzyRegex = require('../lib/fuzzy-regex.js')
 const serverCtrl = require('./lib/server-ctrl.js')
+const galleryMock = require('./lib/gallery-mock.js')
+const mockManyPics = require('./lib/mock-many-pics.js')
 
 // module constants
 const server = require('../server.js')
@@ -213,4 +215,98 @@ describe('testing pic-router', function(){
     })
   })
 
+  describe('testing GET /api/public/pic', function(){
+    describe('with valid request', function(){
+      before(done => mockManyPics.call(this, 100, done))
+      it ('should return an array of pics', done => {
+        request.get(`${url}/api/public/pic`)
+        .end((err, res) => {
+          if (err) return done(err)
+          console.log(res.body)
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          expect(res.body.length).to.equal(50)
+          for(let i=0; i<res.body.length; i++){
+            expect(res.body[i]._id.toString()).to.equal(this.tempPics[i]._id.toString())
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?name=do', function(){
+      before(done => mockManyPics.call(this, 100, done))
+      it ('should return an array of pics', done => {
+        request.get(`${url}/api/public/pic?name=do`)
+        .end((err, res) => {
+          if (err) return done(err)
+          console.log(res.body.length)
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          let fuzzy = fuzzyRegex('do')
+          for(let i=0; i<res.body.length; i++){
+            expect(res.body[i].name).to.match(fuzzy)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?desc=lorem', function(){
+      before(done => mockManyPics.call(this, 50, done))
+      it ('should return an array of pics', done => {
+        request.get(`${url}/api/public/pic?desc=lorem`)
+        .end((err, res) => {
+          if (err) return done(err)
+          console.log(res.body.length)
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          let fuzzy = fuzzyRegex('lorem')
+          for(let i=0; i<res.body.length; i++){
+            expect(res.body[i].desc).to.match(fuzzy)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?desc=lorem%20ip', function(){
+      before(done => mockManyPics.call(this, 50, done))
+      it ('should return an array of pics', done => {
+        request.get(`${url}/api/public/pic?desc=lorem%20ip`)
+        .end((err, res) => {
+          if (err) return done(err)
+          console.log(res.body.length)
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          let fuzzy = fuzzyRegex('lorem ip')
+          for(let i=0; i<res.body.length; i++){
+            expect(res.body[i].desc).to.match(fuzzy)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?desc=lo&name=do', function(){
+      before(done => mockManyPics.call(this, 100, done))
+      it ('should return an array of pics', done => {
+        request.get(`${url}/api/public/pic?desc=lorem&name=do`)
+        .end((err, res) => {
+          if (err) return done(err)
+          console.log(res.body.length)
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          let fuzzyName = fuzzyRegex('do')
+          let fuzzyDesc = fuzzyRegex('lo')
+          for(let i=0; i<res.body.length; i++){
+            expect(res.body[i].name).to.match(fuzzyName)
+            expect(res.body[i].desc).to.match(fuzzyDesc)
+          }
+          done()
+        })
+      })
+    })
+
+  })
 })
