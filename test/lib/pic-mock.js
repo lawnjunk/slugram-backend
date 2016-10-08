@@ -7,12 +7,15 @@ const debug = require('debug')('slugram:pic-mock')
 const Pic = require('../../model/pic.js')
 const awsMocks = require('./aws-mocks.js')
 const galleryMock = require('./gallery-mock.js')
+const lorem = require('lorem-ipsum')
 
 module.exports = function(done){
   debug('creating mock pic')
+  let name = lorem({count: 2, units: 'word'})
+  let desc = lorem({count: 2, units: 'sentence'})
   let examplePicData = {
-    name: 'beach ball',
-    desc: 'party with the tropics',
+    name,
+    desc,
     created: new Date(),
     imageURI: awsMocks.uploadMock.Location,
     objectKey: awsMocks.uploadMock.Key,

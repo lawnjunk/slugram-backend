@@ -11,7 +11,7 @@
     "test": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "lint": "./node_modules/eslint/bin/eslint.js .",
-    "test-debug": "DEBUG=slug* ./node_modules/mocha/bin/mocha"
+    "test-debug": "DEBUG='slug*' ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha"
   },
   "keywords": [],
   "author": "",
