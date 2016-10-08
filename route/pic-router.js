@@ -58,9 +58,13 @@ picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('image')
   // then store monogo Pic
   // then respond to user
 
+  let tempGallery, tempPic
   Gallery.findById(req.params.galleryID)
   .catch(err => Promise.reject(createError(404, err.message)))
-  .then(() => s3UploadPromise(params))  // IF FAILS 500 ERROR
+  .then(gallery  => {
+    tempGallery = gallery
+    return s3UploadPromise(params)// IF FAILS 500 ERROR
+  })  
   .catch(err => err.status ? Promise.reject(err) : Promise.reject(createError(500, err.message)))
   .then(s3data => {
     del([`${dataDir}/*`])
@@ -70,11 +74,15 @@ picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('image')
       objectKey: s3data.Key,
       imageURI: s3data.Location,
       userID: req.user._id,
-      galleryID: req.params.galleryID,
     }
     return new Pic(picData).save()
   })
-  .then(pic => res.json(pic))
+  .then(pic => {
+    tempPic = pic
+    tempGallery.pics.push(pic._id)
+    return tempGallery.save()
+  })
+  .then(() => res.json(tempPic))
   .catch(err => {
     del([`${dataDir}/*`])
     next(err)
@@ -84,28 +92,39 @@ picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('image')
 picRouter.delete('/api/gallery/:galleryID/pic/:picID', bearerAuth, function(req, res, next){
   debug('DELETE /api/gallery/:galleryID/pic/:picID')
 
+
   //check that the pic exists if not 404
-  //check that gallery id is correct if not 400 
   //make sure there userID matches the pic.userID if not 401
+  //check that gallery id is correct if not 404
+  //remove the picID from the gallery 
   //delete the picture from aws
   //delete the pic from mongo
   //respond to the client
-  Pic.findById(req.params.picID)
-  .catch(err => Promise.reject(createError(404, err.message)))
+  let tempPic
+  Pic.findById(req.params.picID) // 404
   .then( pic => {
-    if(pic.galleryID.toString() !== req.params.galleryID)
-      return Promise.reject(createError(400, 'bad request wrong gallery'))
     if(pic.userID.toString() !== req.user._id.toString())
       return Promise.reject(createError(401, 'user not authtorized to delete this pic'))
+    tempPic = pic
+    return Gallery.findById(req.params.galleryID) // 404
+  })
+  .catch(err => Promise.reject(createError(404, err.message))) // if no pic or gal found
+  .then( gallery => { 
+    gallery.pics = gallery.pics.filter( id => {
+      if (id === req.params.picID) return false
+      return true
+    })
+    return gallery.save() // 500 error
+  })
+  .then(() => {
     let params = {
       Bucket: 'slugram-assets',
-      Key: pic.objectKey,
+      Key: tempPic.objectKey,
     }
-    return s3.deleteObject(params).promise()
+    return s3.deleteObject(params).promise() // 500 error
   })
-  .catch(err => err.status ? Promise.reject(err) : Promise.reject(createError(500, err.message)))
   .then(() => {
-    return Pic.findByIdAndRemove(req.params.picID)
+    return Pic.findByIdAndRemove(req.params.picID) //500 
   })
   .then(() => res.sendStatus(204))
   .catch(next)

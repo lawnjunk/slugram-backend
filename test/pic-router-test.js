@@ -47,7 +47,6 @@ describe('testing pic-router', function(){
           expect(res.status).to.equal(200)
           expect(res.body.name).to.equal(examplePic.name)
           expect(res.body.desc).to.equal(examplePic.desc)
-          expect(res.body.galleryID).to.equal(this.tempGallery._id.toString())
           expect(res.body.imageURI).to.equal(awsMocks.uploadMock.Location)
           expect(res.body.objectKey).to.equal(awsMocks.uploadMock.Key)
           done()
@@ -189,12 +188,12 @@ describe('testing pic-router', function(){
 
     describe('with invalid galleryID', function(){
       before(done => picMock.call(this, done))
-      it('should respond with status 400', done => {
+      it('should respond with status 404', done => {
         request.delete(`${url}/api/gallery/${this.tempGallery._id}bad/pic/${this.tempPic._id}`)
         .set({Authorization: `Bearer ${this.tempToken}`})
         .end((err, res) => {
-          expect(res.status).to.equal(400)
-          expect(res.text).to.equal('BadRequestError')
+          expect(res.status).to.equal(404)
+          expect(res.text).to.equal('NotFoundError')
           done()
         })
       })
