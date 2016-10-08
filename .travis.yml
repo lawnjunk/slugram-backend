@@ -14,6 +14,7 @@ env:
   - CXX=g++-4.8
 sudo: required
 before_script: npm i
+after_success: 'npm run coveralls'
 script:
   - npm test
   - npm run lint

@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "4.4.7"
+  },
   "scripts": {
     "start": "node server.js",
-    "test": "./node_modules/mocha/bin/mocha",
+    "test": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "lint": "./node_modules/eslint/bin/eslint.js .",
     "test-debug": "DEBUG=slug* ./node_modules/mocha/bin/mocha"
   },
@@ -31,8 +35,9 @@
   "devDependencies": {
     "aws-sdk-mock": "^1.5.0",
     "chai": "^3.5.0",
+    "coveralls": "^2.11.14",
     "eslint": "^3.7.1",
-    "form-data": "^2.1.1",
+    "istanbul": "^0.4.5",
     "lorem-ipsum": "^1.0.3",
     "mocha": "^3.1.0",
     "superagent": "^2.3.0"
