@@ -9,7 +9,8 @@ const debug = require('debug')('slugram:gallery-route')
 // app
 const Gallery = require('../model/gallery.js')
 const bearerAuth = require('../lib/bearer-auth-middleware.js')
-const pageQueries = require('../lib/query-middleware.js')
+const pageQueries = require('../lib/page-query-middleware.js')
+const itemQueries = require('../lib/item-query-middleware.js')
 
 // constants
 const galleryRouter = module.exports = Router()
@@ -23,9 +24,17 @@ galleryRouter.post('/api/gallery', bearerAuth, jsonParser, function(req, res, ne
 })
 
 
-galleryRouter.get('/api/gallery/:id', bearerAuth, function(req, res, next){
+galleryRouter.get('/api/gallery/:id', bearerAuth, itemQueries,  function(req, res, next){
   debug('GET /api/gallery/:id')
   Gallery.findById(req.params.id)
+  .populate({
+    path: 'pics',
+    options: {
+      sort: {_id: req.query.itemsort},
+      limit: req.query.itemcount,
+      skip: req.query.itemoffset,
+    },
+  })
   .catch(err => Promise.reject(createError(400, err.message)))
   .then(gallery => {
     if (gallery.userID.toString() !== req.user._id.toString())
@@ -62,11 +71,18 @@ galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next){
   .catch(next)
 })
 
-galleryRouter.get('/api/gallery', bearerAuth, pageQueries, function(req, res, next){
+galleryRouter.get('/api/gallery', bearerAuth, pageQueries, itemQueries, function(req, res, next){
   debug('GET /api/gallery')
 
-  
   Gallery.find({userID: req.user._id.toString()})
+  .populate({
+    path: 'pics',
+    options: {
+      sort: {_id: req.query.itemsort},
+      limit: req.query.itemcount,
+      skip: req.query.itemoffset,
+    },
+  })
   .sort({_id: req.query.sort}).skip(req.query.offset).limit(req.query.pagesize)
   .then(galleries => res.json(galleries))
   .catch(next)

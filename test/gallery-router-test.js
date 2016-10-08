@@ -16,6 +16,7 @@ const serverCtrl = require('./lib/server-ctrl.js')
 const cleanDB = require('./lib/clean-db.js')
 const mockUser = require('./lib/user-mock.js')
 const mockGallery = require('./lib/gallery-mock.js')
+const mockManyPics = require('./lib/mock-many-pics.js')
 const mockManyGallerys = require('./lib/mock-many-gallerys.js')
 
 // const
@@ -142,6 +143,29 @@ describe('test /api/gallery', function(){
           expect(res.body.desc).to.equal(exampleGallery.desc)
           expect(res.body.userID).to.equal(this.tempUser._id.toString())
           let date = new Date(res.body.created).toString()
+          expect(date).to.not.equal('Invalid Date')
+          done()
+        })
+      })
+    })
+
+    describe('with many pictures', function(){
+      before(done => mockManyPics.call(this, 100, done))
+      it('should return a gallery', done => {
+        request.get(`${url}/api/gallery/${this.tempGallery._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err)
+            return done(err)
+          console.log('SLKDFJLDKSJF\n', res.body)
+          expect(res.body.name).to.equal(exampleGallery.name)
+          expect(res.body.desc).to.equal(exampleGallery.desc)
+          expect(res.body.userID).to.equal(this.tempUser._id.toString())
+          let date = new Date(res.body.created).toString()
+          expect(Array.isArray(res.body.pics)).to.equal(true)
+          expect(res.body.pics.length).to.equal(100)
           expect(date).to.not.equal('Invalid Date')
           done()
         })
