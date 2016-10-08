@@ -16,6 +16,7 @@ const serverCtrl = require('./lib/server-ctrl.js')
 const cleanDB = require('./lib/clean-db.js')
 const mockUser = require('./lib/user-mock.js')
 const mockGallery = require('./lib/gallery-mock.js')
+const mockManyGallerys = require('./lib/mock-many-gallerys.js')
 
 // const
 const url = `http://localhost:${process.env.PORT}`
@@ -149,7 +150,7 @@ describe('test /api/gallery', function(){
 
     describe('with invalid token', function(){
       before(done => mockGallery.call(this, done))
-      it('should return a gallery', done => {
+      it('should respond with status 401', done => {
         request.get(`${url}/api/gallery/${this.tempGallery._id}`)
         .set({
           Authorization: `Bearer ${this.tempToken}bad`,
@@ -164,7 +165,7 @@ describe('test /api/gallery', function(){
 
     describe('with invalid Bearer auth', function(){
       before(done => mockGallery.call(this, done))
-      it('should return a gallery', done => {
+      it('should respond with status 400', done => {
         request.get(`${url}/api/gallery/${this.tempGallery._id}`)
         .set({ Authorization: 'bad request' })
         .end((err, res) => {
@@ -177,7 +178,7 @@ describe('test /api/gallery', function(){
 
     describe('with no Authorization header', function(){
       before(done => mockGallery.call(this, done))
-      it('should return a gallery', done => {
+      it('should respond with status 400', done => {
         request.get(`${url}/api/gallery/${this.tempGallery._id}`)
         .end((err, res) => {
           expect(res.status).to.equal(400)
@@ -210,7 +211,7 @@ describe('test /api/gallery', function(){
         .catch(done)
       })
 
-      it('should return a gallery', done => {
+      it('should respond with status 401', done => {
         request.get(`${url}/api/gallery/${this.tempGallery._id}`)
         .set({
           Authorization: `Bearer ${this.tempToken}`,
@@ -229,7 +230,7 @@ describe('test /api/gallery', function(){
       // overwrite user, password, and token with new user
       before(done => mockUser.call(this, done))
 
-      it('should return a gallery', done => {
+      it('should respond with status 401', done => {
         request.get(`${url}/api/gallery/${this.tempGallery._id}`)
         .set({
           Authorization: `Bearer ${this.tempToken}`,
@@ -242,4 +243,339 @@ describe('test /api/gallery', function(){
       })
     })
   })
+
+  describe('testing PUT /api/gallery/:galleryID', function(){
+    describe('update name ande desc', function(){
+      // mock user, password, token, and gallery
+      before(done => mockGallery.call(this, done))
+
+      it('should return a gallery', done => {
+        request.put(`${url}/api/gallery/${this.tempGallery._id}`)
+        .send({
+          name: 'hello',
+          desc: 'cool',
+        })
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) return done(err)
+          expect(res.status).to.equal(200)
+          expect(res.body.name).to.equal('hello')
+          expect(res.body.desc).to.equal('cool')
+          done()
+        })
+      })
+    })
+
+    describe('update name', function(){
+      // mock user, password, token, and gallery
+      before(done => mockGallery.call(this, done))
+
+      it('should return a gallery', done => {
+        request.put(`${url}/api/gallery/${this.tempGallery._id}`)
+        .send({
+          name: 'hello',
+        })
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) return done(err)
+          expect(res.status).to.equal(200)
+          expect(res.body.name).to.equal('hello')
+          expect(res.body.desc).to.equal(this.tempGallery.desc)
+          done()
+        })
+      })
+    })
+
+    describe('update desc', function(){
+      // mock user, password, token, and gallery
+      before(done => mockGallery.call(this, done))
+
+      it('should return a gallery', done => {
+        request.put(`${url}/api/gallery/${this.tempGallery._id}`)
+        .send({
+          desc: 'cool',
+        })
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err) return done(err)
+          expect(res.status).to.equal(200)
+          expect(res.body.name).to.equal(this.tempGallery.name)
+          expect(res.body.desc).to.equal('cool')
+          done()
+        })
+      })
+    })
+
+    describe('with bad galeryID', function(){
+      // mock user, password, token, and gallery
+      before(done => mockGallery.call(this, done))
+
+      it('should return a gallery', done => {
+        request.put(`${url}/api/gallery/${this.tempGallery._id}bad`)
+        .send({
+          desc: 'cool',
+        })
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(404)
+          expect(res.text).to.equal('NotFoundError')
+          done()
+        })
+      })
+    })
+
+    describe('with bad token', function(){
+      // mock user, password, token, and gallery
+      before(done => mockGallery.call(this, done))
+
+      it('should respond with status 401', done => {
+        request.put(`${url}/api/gallery/${this.tempGallery._id}`)
+        .send({
+          desc: 'cool',
+        })
+        .set({
+          Authorization: `Bearer ${this.tempToken}bad`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(401)
+          expect(res.text).to.equal('UnauthorizedError')
+          done()
+        })
+      })
+    })
+
+    describe('witn no auth', function(){
+      // mock user, password, token, and gallery
+      before(done => mockGallery.call(this, done))
+
+      it('should respond with status 400', done => {
+        request.put(`${url}/api/gallery/${this.tempGallery._id}bad`)
+        .send({
+          desc: 'cool',
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400)
+          expect(res.text).to.equal('BadRequestError')
+          done()
+        })
+      })
+    })
+  })
+
+  describe('testing DELETE /api/gallery/:galleryID', function(){
+    describe('should respond with status 204', function(){
+      // mock user, password, token, and gallery
+      before(done => mockGallery.call(this, done))
+      it('should return a gallery', done => {
+        request.delete(`${url}/api/gallery/${this.tempGallery._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(204)
+          done()
+        })
+      })
+    })
+
+    describe('with invalid galleryID', function(){
+      // mock user, password, token, and gallery
+      before(done => mockGallery.call(this, done))
+      it('should return a gallery', done => {
+        request.delete(`${url}/api/gallery/${this.tempGallery._id}bad`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(404)
+          expect(res.text).to.equal('NotFoundError')
+          done()
+        })
+      })
+    })
+
+    describe('with invalid token', function(){
+      // mock user, password, token, and gallery
+      before(done => mockGallery.call(this, done))
+      it('should respond with status 401', done => {
+        request.delete(`${url}/api/gallery/${this.tempGallery._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}bad`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(401)
+          expect(res.text).to.equal('UnauthorizedError')
+          done()
+        })
+      })
+    })
+
+    describe('witn no auth', function(){
+      // mock user, password, token, and gallery
+      before(done => mockGallery.call(this, done))
+      it('should respond with status 400', done => {
+        request.delete(`${url}/api/gallery/${this.tempGallery._id}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(400)
+          expect(res.text).to.equal('BadRequestError')
+          done()
+        })
+      })
+    })
+  })
+
+  describe('testing GET /api/gallery', function(){
+    describe('with valid request', function(){
+      before( done => mockManyGallerys.call(this, 100, done))
+      it('should respond with status 400', done => {
+        request.get(`${url}/api/gallery`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          expect(res.body.length).to.equal(50)
+          done()
+        })
+      })
+    })
+
+    describe('with ?pagesize=10', function(){
+      before( done => mockManyGallerys.call(this, 100, done))
+      it('should return 10 notes', done => {
+        request.get(`${url}/api/gallery?pagesize=5`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          expect(res.body.length).to.equal(5)
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].name).to.equal(this.tempGallerys[i].name)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with offset=1', function(){
+      before( done => mockManyGallerys.call(this, 100, done))
+      it('should return 10 notes', done => {
+        request.get(`${url}/api/gallery?offset=1`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          expect(res.body.length).to.equal(50)
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].name).to.equal(this.tempGallerys[i + 1].name)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?page=2', function(){
+      before( done => mockManyGallerys.call(this, 100, done))
+      it('should return 10 notes', done => {
+        request.get(`${url}/api/gallery?page=2`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          expect(res.body.length).to.equal(50)
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].name).to.equal(this.tempGallerys[i + 50].name)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?page=3&?offset=1', function(){
+      before( done => mockManyGallerys.call(this, 150, done))
+      it('should return 10 notes', done => {
+        request.get(`${url}/api/gallery?page=3&offset=1`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          expect(res.body.length).to.equal(49)
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].name).to.equal(this.tempGallerys[i + 101].name)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?page=-1', function(){
+      before( done => mockManyGallerys.call(this, 150, done))
+      it('should return 10 notes', done => {
+        request.get(`${url}/api/gallery?page=-1`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          expect(res.body.length).to.equal(50)
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].name).to.equal(this.tempGallerys[i].name)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?pagesize=-1', function(){
+      before( done => mockManyGallerys.call(this, 50, done))
+      it('should return 10 notes', done => {
+        request.get(`${url}/api/gallery?pagesize=-1`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          expect(res.body.length).to.equal(1)
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].name).to.equal(this.tempGallerys[i].name)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?pagesize=300', function(){
+      before( done => mockManyGallerys.call(this, 300, done))
+      it('should return 10 notes', done => {
+        request.get(`${url}/api/gallery?pagesize=250`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          expect(res.body.length).to.equal(250)
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].name).to.equal(this.tempGallerys[i].name)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with invalid token', function(){
+      before( done => mockManyGallerys.call(this, 50, done))
+      it('should respond with status 401', done => {
+        request.get(`${url}/api/gallery`)
+        .set({ Authorization: `Bearer ${this.tempToken}bad` })
+        .end((err, res) => {
+          expect(res.status).to.equal(401)
+          expect(res.text).to.equal('UnauthorizedError')
+          done()
+        })
+      })
+    })
+  })
+
 })
