@@ -462,6 +462,44 @@ describe('test /api/gallery', function(){
       })
     })
 
+    describe('with ?sort=dsc', function(){
+      before( done => mockManyGallerys.call(this, 100, done))
+      it('should return 10 notes', done => {
+        request.get(`${url}/api/gallery?sort=dsc`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          expect(res.body.length).to.equal(50)
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].name).to.equal(this.tempGallerys[this.tempGallerys.length - i - 1].name)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?sort=dsc?offset=3', function(){
+      before( done => mockManyGallerys.call(this, 100, done))
+      it('should return 10 notes', done => {
+        request.get(`${url}/api/gallery?sort=dsc&offset=3`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          expect(res.body.length).to.equal(50)
+          console.log('res.body\n', res.body)
+          console.log('\n\n\n\n')
+          console.log('this.tempGallerys', this.tempGallerys)
+          for (let i=0; i < res.body.length; i++){
+            let index = this.tempGallerys.length - i - 4 
+            expect(res.body[i].name).to.equal(this.tempGallerys[index].name)
+          }
+          done()
+        })
+      })
+    })
+
     describe('with offset=1', function(){
       before( done => mockManyGallerys.call(this, 100, done))
       it('should return 10 notes', done => {
@@ -577,5 +615,4 @@ describe('test /api/gallery', function(){
       })
     })
   })
-
 })

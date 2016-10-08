@@ -68,6 +68,7 @@ galleryRouter.get('/api/gallery', bearerAuth, pageQueries, function(req, res, ne
   let offset = req.query.offset
   let page = req.query.page
   let pagesize = req.query.pagesize
+  let sort = req.query.sort
   if (page > 1) 
     offset =  (req.query.page - 1) * req.query.pagesize + req.query.offset
   
@@ -75,7 +76,7 @@ galleryRouter.get('/api/gallery', bearerAuth, pageQueries, function(req, res, ne
   console.log('THAT PAGE', page)
   console.log('THAT PAGESIZE', pagesize)
   Gallery.find({userID: req.user._id.toString()})
-  .skip(offset).limit(req.query.pagesize).sort({_id: 1})
+  .sort({_id: sort}).skip(offset).limit(req.query.pagesize)
   .then(galleries => res.json(galleries))
   .catch(next)
 })
