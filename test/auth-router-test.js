@@ -188,6 +188,20 @@ describe('testing auth-router', function(){
       })
     })
 
+    describe('with bad username', function(){
+      before(done => mockUser.call(this, done))
+      it('should respond with status 401', (done) => {
+        request.get(`${url}/api/login`)
+        // this has to be the same user and pass from mockUser
+        .auth('', this.tempPassword)
+        .end((err, res) => {
+          expect(res.status).to.equal(401)
+          expect(res.text).to.equal('UnauthorizedError')
+          done()
+        })
+      })
+    })
+
     describe('with bad password', function(){
       before(done => mockUser.call(this, done))
       it('should respond with status 401', (done) => {
