@@ -18,4 +18,3 @@ after_success: 'npm run coveralls'
 script:
   - npm test
   - npm run lint
-  - npm run coveralls
