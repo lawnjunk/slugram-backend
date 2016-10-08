@@ -78,7 +78,7 @@ galleryRouter.get('/api/gallery', bearerAuth, pageQueries, itemQueries, function
   .populate({
     path: 'pics',
     options: {
-      sort: {_id: req.query.itemsort},
+      sort: {filed: '_id', test:  req.query.itemsort},
       limit: req.query.itemcount,
       skip: req.query.itemoffset,
     },
