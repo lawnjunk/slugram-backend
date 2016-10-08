@@ -143,7 +143,7 @@ describe('test /api/gallery', function(){
           expect(res.body.desc).to.equal(exampleGallery.desc)
           expect(res.body.userID).to.equal(this.tempUser._id.toString())
           let date = new Date(res.body.created).toString()
-          expect(date).to.not.equal('Invalid Date')
+          expect(date).to.equal(this.tempGallery.created.toString())
           done()
         })
       })
@@ -159,14 +159,47 @@ describe('test /api/gallery', function(){
         .end((err, res) => {
           if (err)
             return done(err)
-          console.log('SLKDFJLDKSJF\n', res.body)
           expect(res.body.name).to.equal(exampleGallery.name)
           expect(res.body.desc).to.equal(exampleGallery.desc)
           expect(res.body.userID).to.equal(this.tempUser._id.toString())
-          let date = new Date(res.body.created).toString()
           expect(Array.isArray(res.body.pics)).to.equal(true)
           expect(res.body.pics.length).to.equal(100)
-          expect(date).to.not.equal('Invalid Date')
+          let date = new Date(res.body.created).toString()
+          expect(date).to.equal(this.tempGallery.created.toString())
+          for (let i=0; i< res.body.pics.length; i++){
+            expect(res.body.pics[i]._id.toString()).to.equal(this.tempPics[i]._id.toString())
+            expect(res.body.pics[i].name).to.equal(this.tempPics[i].name)
+            expect(res.body.pics[i].desc).to.equal(this.tempPics[i].desc)
+            expect(res.body.pics[i].imageURI).to.equal(this.tempPics[i].imageURI)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with many pictures and ?itemcount=10', function(){
+      before(done => mockManyPics.call(this, 100, done))
+      it('should return a gallery', done => {
+        request.get(`${url}/api/gallery/${this.tempGallery._id}?itemcount=10`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if (err)
+            return done(err)
+          expect(res.body.name).to.equal(exampleGallery.name)
+          expect(res.body.desc).to.equal(exampleGallery.desc)
+          expect(res.body.userID).to.equal(this.tempUser._id.toString())
+          expect(Array.isArray(res.body.pics)).to.equal(true)
+          expect(res.body.pics.length).to.equal(10)
+          let date = new Date(res.body.created).toString()
+          expect(date).to.equal(this.tempGallery.created.toString())
+          for (let i=0; i< res.body.pics.length; i++){
+            expect(res.body.pics[i]._id.toString()).to.equal(this.tempPics[i]._id.toString())
+            expect(res.body.pics[i].name).to.equal(this.tempPics[i].name)
+            expect(res.body.pics[i].desc).to.equal(this.tempPics[i].desc)
+            expect(res.body.pics[i].imageURI).to.equal(this.tempPics[i].imageURI)
+          }
           done()
         })
       })
