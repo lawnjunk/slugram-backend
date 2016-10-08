@@ -10,6 +10,7 @@ const mongoose = require('mongoose')
 const Promise = require('bluebird')
 
 // app
+const User = require('../model/user.js')
 const server = require('../server.js')
 const serverCtrl = require('./lib/server-ctrl.js')
 const cleanDB = require('./lib/clean-db.js')
@@ -188,6 +189,27 @@ describe('test /api/gallery', function(){
 
     describe('with invalid id', function(){
       before(done => mockGallery.call(this, done))
+      it('should return a gallery', done => {
+        request.get(`${url}/api/gallery/${this.tempGallery._id}bad`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400)
+          expect(res.text).to.equal('BadRequestError')
+          done()
+        })
+      })
+    })
+
+    describe('with user whos been removed', function(){
+      before(done => mockGallery.call(this, done))
+      before(done => {
+        User.remove({})
+        .then(() => done())
+        .catch(done)
+      })
+
       it('should return a gallery', done => {
         request.get(`${url}/api/gallery/${this.tempGallery._id}bad`)
         .set({
