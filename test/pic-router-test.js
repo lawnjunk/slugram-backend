@@ -222,7 +222,6 @@ describe('testing pic-router', function(){
         request.get(`${url}/api/public/pic`)
         .end((err, res) => {
           if (err) return done(err)
-          console.log(res.body)
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
           expect(res.body.length).to.equal(50)
@@ -240,7 +239,6 @@ describe('testing pic-router', function(){
         request.get(`${url}/api/public/pic?name=do`)
         .end((err, res) => {
           if (err) return done(err)
-          console.log(res.body.length)
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
           let fuzzy = fuzzyRegex('do')
@@ -258,7 +256,6 @@ describe('testing pic-router', function(){
         request.get(`${url}/api/public/pic?desc=lorem`)
         .end((err, res) => {
           if (err) return done(err)
-          console.log(res.body.length)
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
           let fuzzy = fuzzyRegex('lorem')
@@ -276,7 +273,6 @@ describe('testing pic-router', function(){
         request.get(`${url}/api/public/pic?desc=lorem%20ip`)
         .end((err, res) => {
           if (err) return done(err)
-          console.log(res.body.length)
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
           let fuzzy = fuzzyRegex('lorem ip')
@@ -294,7 +290,6 @@ describe('testing pic-router', function(){
         request.get(`${url}/api/public/pic?desc=lorem&name=do`)
         .end((err, res) => {
           if (err) return done(err)
-          console.log(res.body.length)
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
           let fuzzyName = fuzzyRegex('do')

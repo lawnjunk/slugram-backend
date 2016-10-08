@@ -137,7 +137,6 @@ picRouter.get('/api/public/pic', pageQuery, function(req, res, next){
   
   if (req.query.name) {
     let fuzzyName = fuzzyRegex(req.query.name)
-    console.log('fuzzyName\n', fuzzyName)
     query.name = {$regex: fuzzyName}
   }
 
