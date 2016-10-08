@@ -488,9 +488,6 @@ describe('test /api/gallery', function(){
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
           expect(res.body.length).to.equal(50)
-          console.log('res.body\n', res.body)
-          console.log('\n\n\n\n')
-          console.log('this.tempGallerys', this.tempGallerys)
           for (let i=0; i < res.body.length; i++){
             let index = this.tempGallerys.length - i - 4 
             expect(res.body[i].name).to.equal(this.tempGallerys[index].name)

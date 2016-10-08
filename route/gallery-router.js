@@ -65,18 +65,9 @@ galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next){
 galleryRouter.get('/api/gallery', bearerAuth, pageQueries, function(req, res, next){
   debug('GET /api/gallery')
 
-  let offset = req.query.offset
-  let page = req.query.page
-  let pagesize = req.query.pagesize
-  let sort = req.query.sort
-  if (page > 1) 
-    offset =  (req.query.page - 1) * req.query.pagesize + req.query.offset
   
-  console.log('THAT OFFSET', offset)
-  console.log('THAT PAGE', page)
-  console.log('THAT PAGESIZE', pagesize)
   Gallery.find({userID: req.user._id.toString()})
-  .sort({_id: sort}).skip(offset).limit(req.query.pagesize)
+  .sort({_id: req.query.sort}).skip(req.query.offset).limit(req.query.pagesize)
   .then(galleries => res.json(galleries))
   .catch(next)
 })
