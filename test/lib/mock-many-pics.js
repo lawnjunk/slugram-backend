@@ -4,7 +4,6 @@
 const Pic = require('../../model/pic.js')
 const debug = require('debug')('slugram:gallery-mock')
 const galleryMock = require('./gallery-mock.js')
-const awsMocks = require('./aws-mocks.js')
 const lorem = require('lorem-ipsum')
 
 // create a uesr, token, pass, gallery
