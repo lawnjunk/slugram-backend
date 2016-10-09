@@ -1,66 +1,68 @@
 'use strict'
 
-// dont try this at home
-// this code is 100% hacky bad news
-const debug = require('debug')('slugram:gallery-mock')
+const Promise = require('bluebird')
+const lorem = require('lorem-ipsum')
+const debug = require('debug')('slugram:gallery-mock-everything')
+
 const Pic = require('../../model/pic.js')
 const User = require('../../model/user.js')
 const Gallery = require('../../model/gallery.js')
-const lorem = require('lorem-ipsum')
-const Promise = require('bluebird')
 
-// mock a bunch of users
-// then a bunch of gallerys for each user
-// then about of notes  for each gallery
 module.exports = function(options, done){
-  debug(`mock everything`)
-  let userMocks = []
-  let galleryMocks = []
-  for(var i=0; i<options.users; i++){
-    userMocks.push(mockAUser())
-  }
+  if(!checkOptions)
+    return done('bad options')
+
+  // make usercount
+  // make gallerycount for each user
+  // make pictures for each gallery
+  this.tempUserData = []
   this.tempGallerys = []
+  this.tempPics = []
 
-  Promise.all(userMocks)
-  .then( tempUsers => {
-    this.tempUsers = tempUsers
-    tempUsers.forEach( tempuser => {
-      for (let i=0; i<options.gallerys; i++){
-        let userID = tempuser.tempUser._id.toString()
-        let username = tempuser.tempUser.username
-        galleryMocks.push(mockAGallery(userID, username))
-      }
-    })
-    return Promise.all(galleryMocks)
+  let makeUsers = []
+  for(var i=0; i<options.users; i++){
+    makeUsers.push(mockAUser())
+  }
+
+  Promise.all(makeUsers)
+  .map( userdata => {
+    this.tempUserData.push(userdata)
+    let makeUserGallerys = []
+    let userID = userdata.tempUser._id.toString()
+    let username  = userdata.tempUser.username
+    for(var i=0; i<options.gallerys; i++){
+      makeUserGallerys.push(mockAGallery(userID, username))
+    }
+    return Promise.all(makeUserGallerys)
   })
-  .then(gallerys => {
-    this.tempPics = []
-    let saveGals = []
-    return Promise.resolve(gallerys)
-    .each( gal => {
-      let galpics = []
-      let userID = gal.userID
-      let username = gal.username
-
-      // crate picks for each gallery
-      for(let i=0; i<options.pics; i++){
-        galpics.push(mockAPic(userID, username))
+  .map(userGallerys => {
+    return Promise.resolve(userGallerys)
+    .map(gallery => {
+      let makeGalleryPics = []
+      let userID = gallery.userID.toString()
+      let username = gallery.username
+      for(var i=0; i<options.pics; i++){
+        makeGalleryPics.push(mockAPic(userID, username))
       }
-
-      return Promise.all(galpics)
-      .then( pics => {
-        return Promise.resolve(pics)
-        .each(pic => {
-          gal.pics.push(pic._id.toString())
-          this.tempPics.push(pic)
-          return gal.save()
-          .then(gal => this.tempGallerys.push(gal))
-        })
+      return Promise.all(makeGalleryPics)
+      .map( pic => {
+        this.tempPics.push(pic)
+        let picID = pic._id.toString()
+        gallery.pics.push(picID)
+        return gallery.save()
       })
+      .each(gallery => this.tempGallerys.push(gallery))
     })
   })
   .then(() => done())
   .catch(done)
+}
+
+function checkOptions(options){
+  if (!options.users) return false
+    if (!options.gallerys) return false
+      if (!options.pics) return false
+        return true
 }
 
 function mockAUser(){
@@ -76,11 +78,6 @@ function mockAUser(){
   let tempUser, tempToken
   return new User(exampleUser)
   .generatePasswordHash(tempPassword)
-  .then( user => {
-    tempUser = user
-    user.generateFindHash()
-  })
-  .then( () => tempUser.save())
   .then( user => {
     tempUser = user
     return user.generateToken()

@@ -15,7 +15,7 @@ let fuzzyRegex = require('../lib/fuzzy-regex.js')
 const serverCtrl = require('./lib/server-ctrl.js')
 const galleryMock = require('./lib/gallery-mock.js')
 const mockManyPics = require('./lib/mock-many-pics.js')
-const mockManyEverything = require('./lib/mock-many-everything.js')
+const mockManyEverything = require('./lib/everything-mock.js')
 
 // module constants
 const server = require('../server.js')

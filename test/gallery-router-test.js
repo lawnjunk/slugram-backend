@@ -19,7 +19,8 @@ const fuzzyRegex = require('../lib/fuzzy-regex.js')
 const mockGallery = require('./lib/gallery-mock.js')
 const mockManyPics = require('./lib/mock-many-pics.js')
 const mockManyGallerys = require('./lib/mock-many-gallerys.js')
-const mockManyEverything = require('./lib/mock-many-everything.js')
+//const mockManyEverything = require('./lib/mock-many-everything.js')
+const mockManyEverything = require('./lib/everything-mock.js')
 
 // const
 const url = `http://localhost:${process.env.PORT}`
@@ -836,7 +837,96 @@ describe('test /api/gallery', function(){
         .end((err, res) => {
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
-          console.log(res.body)
+          done()
+        })
+      })
+    })
+
+    describe('with ?username=lu', function(){
+      let options = {
+        users: 30,
+        gallerys: 1,
+        pics: 1,
+      }
+
+      before( done => mockManyEverything.call(this, options, done))
+      it('should respond nodes with fuzzy match lu', done => {
+        request.get(`${url}/api/public/gallery?username=lu`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          let fuzzy = fuzzyRegex('lu')
+          console.log('matches found', res.body.length)
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].username).to.match(fuzzy)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?name=lu', function(){
+      let options = {
+        users: 5,
+        gallerys: 10,
+        pics: 1,
+      }
+
+      before( done => mockManyEverything.call(this, options, done))
+      it('should respond nodes with fuzzy match lu', done => {
+        request.get(`${url}/api/public/gallery?name=lu`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          let fuzzy = fuzzyRegex('lu')
+          console.log('matches found', res.body.length)
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].name).to.match(fuzzy)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?itemcount=4', function(){
+      let options = {
+        users: 2,
+        gallerys: 5,
+        pics: 10,
+      }
+
+      before( done => mockManyEverything.call(this, options, done))
+      it('each galery should have 4 pics', done => {
+        request.get(`${url}/api/public/gallery?itemcount=4`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          let fuzzy = fuzzyRegex('lu')
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].pics.length).to.equal(4)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?pagesize=4', function(){
+      let options = {
+        users: 2,
+        gallerys: 5,
+        pics: 10,
+      }
+
+      before( done => mockManyEverything.call(this, options, done))
+      it('show top 4 galerys with 10 pics', done => {
+        request.get(`${url}/api/public/gallery?pagesize=4`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          expect(res.body.length).to.equal(4)
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].pics.length).to.equal(10)
+          }
           done()
         })
       })
