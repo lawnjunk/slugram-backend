@@ -23,6 +23,7 @@ module.exports = function(done){
 
   galleryMock.call(this, err => {
     if (err) return done(err)
+    examplePicData.username = this.tempUser.username
     examplePicData.userID = this.tempUser._id.toString()
     examplePicData.galleryID = this.tempGallery._id.toString()
     new Pic(examplePicData).save()

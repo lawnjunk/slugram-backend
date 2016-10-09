@@ -18,6 +18,7 @@ const galleryRouter = module.exports = Router()
 galleryRouter.post('/api/gallery', bearerAuth, jsonParser, function(req, res, next){
   debug('POST /api/gallery')
   req.body.userID = req.user._id
+  req.body.username = req.user.username
   new Gallery(req.body).save()
   .then( gallery => res.json(gallery))
   .catch(next)
