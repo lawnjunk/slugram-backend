@@ -17,8 +17,9 @@ module.exports = function(count, done){
     if (err) return done(err)
     let picMocks = []
     let userID = this.tempUser._id.toString()
+    let username = this.tempUser.username
     for(var i=0; i<count; i++){
-      picMocks.push(mockAPic(userID))
+      picMocks.push(mockAPic(userID, username))
     }
     Promise.all(picMocks)
     .then(tempPics => {
@@ -34,7 +35,7 @@ module.exports = function(count, done){
   })
 }
 
-function mockAPic(userID){
+function mockAPic(userID, username){
   let name = lorem({count: 2, units: 'word'})
   let desc = lorem({count: 2, units: 'sentence'})
   let uri = lorem({count: 5, units: 'word'}).split(' ').join('-')
@@ -44,6 +45,7 @@ function mockAPic(userID){
     name,
     desc,
     userID,
+    username,
     imageURI,
     objectKey,
     created: new Date(),
