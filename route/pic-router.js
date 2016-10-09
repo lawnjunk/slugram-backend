@@ -14,9 +14,10 @@ const debug = require('debug')('sulgram:pic-router')
 // app module
 const Pic = require('../model/pic.js')
 const Gallery = require('../model/gallery.js')
-const fuzzyRegex = require('../lib/fuzzy-regex.js')
-const bearerAuth = require('../lib/bearer-auth-middleware.js')
+//const fuzzyRegex = require('../lib/fuzzy-regex.js')
 const pageQuery = require('../lib/page-query-middleware.js')
+const bearerAuth = require('../lib/bearer-auth-middleware.js')
+const fuzzyQueryGen = require('../lib/find-fuzzy-query-gen.js')
 
 // Use bluebird implementation of Promise
 // will add a .promise() to AWS.Request 
@@ -133,19 +134,11 @@ picRouter.delete('/api/gallery/:galleryID/pic/:picID', bearerAuth, function(req,
   .catch(next)
 })
 
+// anyone can hit this route
 picRouter.get('/api/public/pic', pageQuery, function(req, res, next){
-  let query = {}
+  let fuzzyFields = [ 'username', 'name', 'desc' ]
+  let query = fuzzyQueryGen(fuzzyFields, req.query)
   
-  if (req.query.name) {
-    let fuzzyName = fuzzyRegex(req.query.name)
-    query.name = {$regex: fuzzyName}
-  }
-
-  if (req.query.desc) {
-    let fuzzyDesc = fuzzyRegex(req.query.desc)
-    query.desc = {$regex: fuzzyDesc}
-  }
-
   Pic.find(query)
   .sort({_id: req.query.sort}).skip(req.query.offset).limit(req.query.pagesize)
   .then(pics => res.json(pics))
@@ -153,3 +146,13 @@ picRouter.get('/api/public/pic', pageQuery, function(req, res, next){
 })
 
 
+// this route is private and only returns a users pictures
+picRouter.get('/api/pic', bearerAuth, pageQuery, function(req, res, next){
+  let fuzzyFields = [ 'name', 'desc' ]
+  let query = fuzzyQueryGen(fuzzyFields, req.query)
+  query.userID = req.user._id.toString() 
+  Pic.find(query)
+  .sort({_id: req.query.sort}).skip(req.query.offset).limit(req.query.pagesize)
+  .then(pics => res.json(pics))
+  .catch(next)
+})

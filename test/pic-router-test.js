@@ -15,6 +15,7 @@ let fuzzyRegex = require('../lib/fuzzy-regex.js')
 const serverCtrl = require('./lib/server-ctrl.js')
 const galleryMock = require('./lib/gallery-mock.js')
 const mockManyPics = require('./lib/mock-many-pics.js')
+//const mockManyEverything = require('./lib/mock-many-user-gal-pic.js')
 
 // module constants
 const server = require('../server.js')
@@ -250,17 +251,17 @@ describe('testing pic-router', function(){
       })
     })
 
-    describe('with ?desc=lorem', function(){
-      before(done => mockManyPics.call(this, 50, done))
+    describe('with ?username=lo', function(){
+      before(done => mockManyEverything.call(this, 11, done))
       it ('should return an array of pics', done => {
-        request.get(`${url}/api/public/pic?desc=lorem`)
+        request.get(`${url}/api/public/pic?username=lo`)
         .end((err, res) => {
           if (err) return done(err)
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
-          let fuzzy = fuzzyRegex('lorem')
+          let fuzzy = fuzzyRegex('lo')
           for(let i=0; i<res.body.length; i++){
-            expect(res.body[i].desc).to.match(fuzzy)
+            expect(res.body[i].username).to.match(fuzzy)
           }
           done()
         })
@@ -302,6 +303,68 @@ describe('testing pic-router', function(){
         })
       })
     })
-
   })
+
+  //describe('testing GET /api/pic', function(){
+    //describe('with valid token', function(){
+      //before(done => mockManyPics.call(this, 100, done))
+      //it ('should return an array of pics', done => {
+        //request.get(`${url}/api/pic`)
+        //.set({Authorization: `Bearer ${this.tempToken}`})
+        //.end((err, res) => {
+          //if (err) return done(err)
+          //expect(res.status).to.equal(200)
+          //expect(Array.isArray(res.body)).to.equal(true)
+          //for(let i=0; i<res.body.length; i++){
+            //expect(res.body[i].name).to.equal(this.tempPics[i].name)
+          //}
+          //done()
+        //})
+      //})
+    //})
+
+    //describe('with invalid token', function(){
+      //before(done => mockManyPics.call(this, 100, done))
+      //it ('should return an array of pics', done => {
+        //request.get(`${url}/api/pic`)
+        //.set({Authorization: `Bearer ${this.tempToken}bad`})
+        //.end((err, res) => {
+          //expect(res.status).to.equal(401)
+          //done()
+        //})
+      //})
+    //})
+
+    //describe('with ?name=do', function(){
+      //before(done => mockManyPics.call(this, 100, done))
+      //it ('should return an array of pics', done => {
+        //request.get(`${url}/api/pic?name=do`)
+        //.set({Authorization: `Bearer ${this.tempToken}`})
+        //.end((err, res) => {
+          //expect(res.status).to.equal(200)
+          //let fuzzyName = fuzzyRegex('do')
+          //for(let i=0; i<res.body.length; i++){
+            //expect(res.body[i].name).to.match(fuzzyName)
+          //}
+          //done()
+        //})
+      //})
+    //})
+
+    //describe('with ?desc=do', function(){
+      //before(done => mockManyPics.call(this, 10, done))
+      //it ('should return an array of pics', done => {
+        //request.get(`${url}/api/pic?desc=do`)
+        //.set({Authorization: `Bearer ${this.tempToken}`})
+        //.end((err, res) => {
+          //expect(res.status).to.equal(200)
+          //let fuzzyName = fuzzyRegex('do')
+          //for(let i=0; i<res.body.length; i++){
+            //expect(res.body[i].desc).to.match(fuzzyName)
+          //}
+          //done()
+        //})
+      //})
+    //})
+  //})
 })
