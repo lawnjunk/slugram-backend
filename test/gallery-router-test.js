@@ -433,10 +433,31 @@ describe('test /api/gallery', function(){
           Authorization: `Bearer ${this.tempToken}`,
         })
         .end((err, res) => {
-          if (err) return done(err)
+          if(err) return done(err)
           expect(res.status).to.equal(200)
           expect(res.body.name).to.equal('hello')
           expect(res.body.desc).to.equal('cool')
+          done()
+        })
+      })
+    })
+
+    describe('update name ande desc', function(){
+      // mock user, password, token, and gallery
+      before(done => mockGallery.call(this, done))
+      before(done => mockUser.call(this, done))
+
+      it('should return a gallery', done => {
+        request.put(`${url}/api/gallery/${this.tempGallery._id}`)
+        .send({
+          name: 'hello',
+          desc: 'cool',
+        })
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(401)
           done()
         })
       })
@@ -569,6 +590,20 @@ describe('test /api/gallery', function(){
         .end((err, res) => {
           expect(res.status).to.equal(404)
           expect(res.text).to.equal('NotFoundError')
+          done()
+        })
+      })
+    })
+
+    describe('with invalid galleryID', function(){
+      // mock user, password, token, and gallery
+      before(done => mockGallery.call(this, done))
+      before(done => mockUser.call(this, done))
+      it('should return a gallery', done => {
+        request.delete(`${url}/api/gallery/${this.tempGallery._id}`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(401)
           done()
         })
       })

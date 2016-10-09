@@ -26,24 +26,13 @@ AWS.config.setPromisesDependency(require('bluebird'))
 const s3 = new AWS.S3()
 const dataDir =`${__dirname}/../data` 
 const upload = multer({dest: dataDir })
+const s3UploadPromise = require('../lib/s3-upload-promise.js')
 const picRouter = module.exports = require('express').Router()
-
-function s3UploadPromise(params){
-  return new Promise((resolve, reject) => {
-    s3.upload(params, (err, s3data) => {
-      if (err) 
-        return reject(err)
-      resolve(s3data)
-    })
-  })
-}
 
 picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('image'), function(req, res, next){
   debug('POST /api/gallery/:galleryID/pic')
   if(!req.file)
     return next(createError(400, 'no file found'))
-  if(!req.file.path)
-    return next(createError(500, 'file was not saved'))
 
   let ext = path.extname(req.file.originalname) // '.png' | '.gif' | '.tar.gz'
 
