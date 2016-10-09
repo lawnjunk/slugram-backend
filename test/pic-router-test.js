@@ -9,8 +9,10 @@ const expect = require('chai').expect
 const request = require('superagent')
 
 // app modules
+
 const picMock = require('./lib/pic-mock.js')
 const cleanDB = require('./lib/clean-db.js')
+const userMock = require('./lib/user-mock.js')
 let fuzzyRegex = require('../lib/fuzzy-regex.js')
 const serverCtrl = require('./lib/server-ctrl.js')
 const galleryMock = require('./lib/gallery-mock.js')
@@ -159,6 +161,20 @@ describe('testing pic-router', function(){
         .end((err, res) => {
           expect(res.status).to.equal(401)
           expect(res.text).to.equal('UnauthorizedError')
+          done()
+        })
+      })
+    })
+
+    describe('should resond with 401', function(){
+      before(done => picMock.call(this, done))
+      before(done => userMock.call(this, done))
+
+      it('should respond with status 401', done => {
+        request.delete(`${url}/api/gallery/${this.tempGallery._id}/pic/${this.tempPic._id}`)
+        .set({Authorization: `Bearer ${this.tempToken}`})
+        .end((err, res) => {
+          expect(res.status).to.equal(401)
           done()
         })
       })
