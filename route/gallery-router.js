@@ -83,7 +83,7 @@ galleryRouter.get('/api/gallery', bearerAuth, pageQueries, itemQueries, function
   .populate({
     path: 'pics',
     options: {
-      sort: {filed: '_id', test:  req.query.itemsort},
+      sort: {_id: req.query.itemsort},
       limit: req.query.itemcount,
       skip: req.query.itemoffset,
     },
@@ -97,11 +97,12 @@ galleryRouter.get('/api/gallery', bearerAuth, pageQueries, itemQueries, function
 galleryRouter.get('/api/public/gallery', pageQueries, itemQueries, function(req, res, next){
   let fields = ['username', 'name', 'desc']
   let query = fuzzyQuery(fields, req.query)
+  console.log('req.query.itemcount', req.query.itemcount)
   Gallery.find(query)
   .populate({
     path: 'pics',
     options: {
-      sort: {filed: '_id', test:  req.query.itemsort},
+      sort: {_id: req.query.itemsort},
       limit: req.query.itemcount,
       skip: req.query.itemoffset,
     },

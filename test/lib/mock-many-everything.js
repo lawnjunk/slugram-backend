@@ -1,12 +1,13 @@
 'use strict'
 
 // dont try this at home
-// this code is 100% hacky bad news 
+// this code is 100% hacky bad news
 const debug = require('debug')('slugram:gallery-mock')
 const Pic = require('../../model/pic.js')
 const User = require('../../model/user.js')
 const Gallery = require('../../model/gallery.js')
 const lorem = require('lorem-ipsum')
+const Promise = require('bluebird')
 
 // mock a bunch of users
 // then a bunch of gallerys for each user
@@ -34,28 +35,31 @@ module.exports = function(options, done){
   .then(gallerys => {
     this.tempPics = []
     let saveGals = []
-    gallerys.forEach( gal => {
+    return Promise.resolve(gallerys)
+    .each( gal => {
       let galpics = []
+      this.tempGallerys = []
       let userID = gal.userID
       let username = gal.username
+
+      // crate picks for each gallery
       for(let i=0; i<options.pics; i++){
         galpics.push(mockAPic(userID, username))
       }
-      Promise.all(galpics)
+
+      return Promise.all(galpics)
       .then( pics => {
-        pics.forEach( pic => {
+        return Promise.resolve(pics)
+        .each(pic => {
           gal.pics.push(pic._id.toString())
           this.tempPics.push(pic)
+          return gal.save()
+          .then(gal => this.tempGallerys.push(gal))
         })
       })
-      saveGals.push(gal.save())
     })
-    return Promise.all(saveGals) 
   })
-  .then(gallerys => {
-    this.tempGallerys = gallerys
-    done()
-  })
+  .then(() => done())
   .catch(done)
 }
 
@@ -70,7 +74,7 @@ function mockAUser(){
   }
   let tempPassword = password
   let tempUser, tempToken
-  return new User(exampleUser) 
+  return new User(exampleUser)
   .generatePasswordHash(tempPassword)
   .then( user => {
     tempUser = user
@@ -104,7 +108,7 @@ function mockAPic(userID, username){
   let uri = lorem({count: 5, units: 'word'}).split(' ').join('-')
   let objectKey = lorem({count: 5, units: 'word'}).split(' ').join('')
   let imageURI = `https://${uri}/${objectKey}`
-  let examplePicData = {
+    let examplePicData = {
     name,
     desc,
     userID,

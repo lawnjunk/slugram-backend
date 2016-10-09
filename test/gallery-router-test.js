@@ -12,12 +12,14 @@ const Promise = require('bluebird')
 // app
 const User = require('../model/user.js')
 const server = require('../server.js')
-const serverCtrl = require('./lib/server-ctrl.js')
 const cleanDB = require('./lib/clean-db.js')
 const mockUser = require('./lib/user-mock.js')
+const serverCtrl = require('./lib/server-ctrl.js')
+const fuzzyRegex = require('../lib/fuzzy-regex.js')
 const mockGallery = require('./lib/gallery-mock.js')
 const mockManyPics = require('./lib/mock-many-pics.js')
 const mockManyGallerys = require('./lib/mock-many-gallerys.js')
+const mockManyEverything = require('./lib/mock-many-everything.js')
 
 // const
 const url = `http://localhost:${process.env.PORT}`
@@ -778,6 +780,63 @@ describe('test /api/gallery', function(){
         .end((err, res) => {
           expect(res.status).to.equal(401)
           expect(res.text).to.equal('UnauthorizedError')
+          done()
+        })
+      })
+    })
+
+    describe('with ?name=co', function(){
+      before( done => mockManyGallerys.call(this, 100, done))
+      it('should respond nodes with fuzzy match co', done => {
+        request.get(`${url}/api/gallery?name=co`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          console.log('matching notes', res.body.length)
+          let fuzzyName = fuzzyRegex('co')
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].name).to.match(fuzzyName)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?desc=co', function(){
+      before( done => mockManyGallerys.call(this, 100, done))
+      it('should respond nodes with fuzzy match co', done => {
+        request.get(`${url}/api/gallery?desc=co`)
+        .set({ Authorization: `Bearer ${this.tempToken}` })
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          console.log('matching notes', res.body.length)
+          let fuzzyName = fuzzyRegex('co')
+          for (let i=0; i < res.body.length; i++){
+            expect(res.body[i].desc).to.match(fuzzyName)
+          }
+          done()
+        })
+      })
+    })
+  })
+
+  describe('testing GET /api/public/gallery', function(){
+    describe('with valid request', function(){
+      let options = {
+        users: 4,
+        gallerys: 3,
+        pics: 4,
+      }
+
+      before( done => mockManyEverything.call(this, options, done))
+      it('should respond nodes with fuzzy match co', done => {
+        request.get(`${url}/api/public/gallery`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          console.log(res.body)
           done()
         })
       })
