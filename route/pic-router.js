@@ -100,7 +100,7 @@ picRouter.delete('/api/gallery/:galleryID/pic/:picID', bearerAuth, function(req,
     tempPic = pic
     return Gallery.findById(req.params.galleryID) // 404
   })
-  .catch(err => Promise.reject(createError(404, err.message))) // if no pic or gal found
+  .catch(err => err.status? Promise.reject(err) : Promise.reject(createError(404, err.message))) // if no pic or gal found
   .then( gallery => { 
     gallery.pics = gallery.pics.filter( id => {
       if (id === req.params.picID) return false
