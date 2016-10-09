@@ -15,6 +15,7 @@ let fuzzyRegex = require('../lib/fuzzy-regex.js')
 const serverCtrl = require('./lib/server-ctrl.js')
 const galleryMock = require('./lib/gallery-mock.js')
 const mockManyPics = require('./lib/mock-many-pics.js')
+const mockManyEverything = require('./lib/mock-many-everything.js')
 
 // module constants
 const server = require('../server.js')
@@ -44,7 +45,7 @@ describe('testing pic-router', function(){
         .field('desc', examplePic.desc)
         .attach('image', examplePic.image)
         .end((err, res) => {
-          if (err) 
+          if (err)
             return done(err)
           expect(res.status).to.equal(200)
           expect(res.body.name).to.equal(examplePic.name)
@@ -221,7 +222,8 @@ describe('testing pic-router', function(){
       it ('should return an array of pics', done => {
         request.get(`${url}/api/public/pic`)
         .end((err, res) => {
-          if (err) return done(err)
+          if (err)
+            return done(err)
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
           expect(res.body.length).to.equal(50)
@@ -238,7 +240,8 @@ describe('testing pic-router', function(){
       it ('should return an array of pics', done => {
         request.get(`${url}/api/public/pic?name=do`)
         .end((err, res) => {
-          if (err) return done(err)
+          if (err)
+            return done(err)
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
           let fuzzy = fuzzyRegex('do')
@@ -255,7 +258,8 @@ describe('testing pic-router', function(){
       it ('should return an array of pics', done => {
         request.get(`${url}/api/public/pic?desc=lorem`)
         .end((err, res) => {
-          if (err) return done(err)
+          if (err)
+            return done(err)
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
           let fuzzy = fuzzyRegex('lorem')
@@ -272,7 +276,8 @@ describe('testing pic-router', function(){
       it ('should return an array of pics', done => {
         request.get(`${url}/api/public/pic?desc=lorem%20ip`)
         .end((err, res) => {
-          if (err) return done(err)
+          if (err)
+            return done(err)
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
           let fuzzy = fuzzyRegex('lorem ip')
@@ -289,7 +294,8 @@ describe('testing pic-router', function(){
       it ('should return an array of pics', done => {
         request.get(`${url}/api/public/pic?desc=lorem&name=do`)
         .end((err, res) => {
-          if (err) return done(err)
+          if (err)
+            return done(err)
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
           let fuzzyName = fuzzyRegex('do')
@@ -303,5 +309,101 @@ describe('testing pic-router', function(){
       })
     })
 
+    describe('with ?username=lop', function(){
+      let options = {
+        users: 20,
+        gallerys: 2,
+        pics: 5,
+      }
+      before(done => mockManyEverything.call(this, options, done))
+      //before(function(done){
+        //this.timeout(5000)
+        //mockManyEverything.call(this, 20, function(err){
+          //if(err) return done(err)
+          //done()
+        //})
+      //})
+
+      it ('should return an array of pics', done => {
+        request.get(`${url}/api/public/pic?username=lop`)
+        .end((err, res) => {
+          if (err)
+            return done(err)
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          let fuzzyuser = fuzzyRegex('lo')
+          console.log('pics in response', res.body.length)
+          for(let i=0; i<res.body.length; i++){
+            expect(res.body[i].username).to.match(fuzzyuser)
+          }
+          done()
+        })
+      })
+    })
+  })
+
+  describe('testing GET /api/pic', function(){
+    describe('with valid token', function(){
+      before(done => mockManyPics.call(this, 100, done))
+      it ('should return an array of pics', done => {
+        request.get(`${url}/api/pic`)
+        .set({Authorization: `Bearer ${this.tempToken}`})
+        .end((err, res) => {
+          if (err)
+            return done(err)
+          expect(res.status).to.equal(200)
+          expect(Array.isArray(res.body)).to.equal(true)
+          for(let i=0; i<res.body.length; i++){
+            expect(res.body[i].name).to.equal(this.tempPics[i].name)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with invalid token', function(){
+      before(done => mockManyPics.call(this, 100, done))
+      it ('should return an array of pics', done => {
+        request.get(`${url}/api/pic`)
+        .set({Authorization: `Bearer ${this.tempToken}bad`})
+        .end((err, res) => {
+          expect(res.status).to.equal(401)
+          done()
+        })
+      })
+    })
+
+    
+    describe('with ?name=do', function(){
+      before(done => mockManyPics.call(this, 100, done))
+      it ('should return an array of pics', done => {
+        request.get(`${url}/api/pic?name=do`)
+        .set({Authorization: `Bearer ${this.tempToken}`})
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          let fuzzyName = fuzzyRegex('do')
+          for(let i=0; i<res.body.length; i++){
+            expect(res.body[i].name).to.match(fuzzyName)
+          }
+          done()
+        })
+      })
+    })
+
+    describe('with ?desc=do', function(){
+      before(done => mockManyPics.call(this, 10, done))
+      it ('should return an array of pics', done => {
+        request.get(`${url}/api/pic?desc=do`)
+        .set({Authorization: `Bearer ${this.tempToken}`})
+        .end((err, res) => {
+          expect(res.status).to.equal(200)
+          let fuzzyName = fuzzyRegex('do')
+          for(let i=0; i<res.body.length; i++){
+            expect(res.body[i].desc).to.match(fuzzyName)
+          }
+          done()
+        })
+      })
+    })
   })
 })
