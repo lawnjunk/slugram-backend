@@ -14,7 +14,7 @@ const debug = require('debug')('sulgram:pic-router')
 // app module
 const Pic = require('../model/pic.js')
 const Gallery = require('../model/gallery.js')
-const fuzzyRegex = require('../lib/fuzzy-regex.js')
+const fuzzyQuery = require('../lib/find-fuzzy-query-gen.js')
 const bearerAuth = require('../lib/bearer-auth-middleware.js')
 const pageQuery = require('../lib/page-query-middleware.js')
 
@@ -134,17 +134,8 @@ picRouter.delete('/api/gallery/:galleryID/pic/:picID', bearerAuth, function(req,
 })
 
 picRouter.get('/api/public/pic', pageQuery, function(req, res, next){
-  let query = {}
-  
-  if (req.query.name) {
-    let fuzzyName = fuzzyRegex(req.query.name)
-    query.name = {$regex: fuzzyName}
-  }
-
-  if (req.query.desc) {
-    let fuzzyDesc = fuzzyRegex(req.query.desc)
-    query.desc = {$regex: fuzzyDesc}
-  }
+  let fields = ['username', 'name', 'desc']
+  let query = fuzzyQuery(fields, req.query)
 
   Pic.find(query)
   .sort({_id: req.query.sort}).skip(req.query.offset).limit(req.query.pagesize)
@@ -152,4 +143,14 @@ picRouter.get('/api/public/pic', pageQuery, function(req, res, next){
   .catch(next)
 })
 
+ // this route is private and only returns a users pictures
+picRouter.get('/api/pic', bearerAuth, pageQuery, function(req, res, next){
+  let fuzzyFields = [ 'name', 'desc' ]
+  let query = fuzzyQuery(fuzzyFields, req.query)
+  query.userID = req.user._id.toString() 
+  Pic.find(query)
+  .sort({_id: req.query.sort}).skip(req.query.offset).limit(req.query.pagesize)
+  .then(pics => res.json(pics))
+  .catch(next)
+}) 
 
