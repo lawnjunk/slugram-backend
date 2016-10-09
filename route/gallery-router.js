@@ -11,6 +11,7 @@ const Gallery = require('../model/gallery.js')
 const bearerAuth = require('../lib/bearer-auth-middleware.js')
 const pageQueries = require('../lib/page-query-middleware.js')
 const itemQueries = require('../lib/item-query-middleware.js')
+const fuzzyQuery = require('../lib/find-fuzzy-query-gen.js')
 
 // constants
 const galleryRouter = module.exports = Router()
@@ -75,7 +76,28 @@ galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next){
 galleryRouter.get('/api/gallery', bearerAuth, pageQueries, itemQueries, function(req, res, next){
   debug('GET /api/gallery')
 
-  Gallery.find({userID: req.user._id.toString()})
+  let fields = ['name', 'desc']
+  let query = fuzzyQuery(fields, req.query)
+  query.userID = req.user._id.toString()
+  Gallery.find(query)
+  .populate({
+    path: 'pics',
+    options: {
+      sort: {filed: '_id', test:  req.query.itemsort},
+      limit: req.query.itemcount,
+      skip: req.query.itemoffset,
+    },
+  })
+  .sort({_id: req.query.sort}).skip(req.query.offset).limit(req.query.pagesize)
+  .then(galleries => res.json(galleries))
+  .catch(next)
+})
+
+// public anyone can call
+galleryRouter.get('/api/public/gallery', pageQueries, itemQueries, function(req, res, next){
+  let fields = ['username', 'name', 'desc']
+  let query = fuzzyQuery(fields, req.query)
+  Gallery.find(query)
   .populate({
     path: 'pics',
     options: {
