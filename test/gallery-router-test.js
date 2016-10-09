@@ -901,7 +901,6 @@ describe('test /api/gallery', function(){
         .end((err, res) => {
           expect(res.status).to.equal(200)
           expect(Array.isArray(res.body)).to.equal(true)
-          let fuzzy = fuzzyRegex('lu')
           for (let i=0; i < res.body.length; i++){
             expect(res.body[i].pics.length).to.equal(4)
           }

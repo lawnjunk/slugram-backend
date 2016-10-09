@@ -9,6 +9,7 @@ const User = require('../../model/user.js')
 const Gallery = require('../../model/gallery.js')
 
 module.exports = function(options, done){
+  debug('mocking users, gallerys, and pics')
   if(!checkOptions)
     return done('bad options')
 
@@ -59,10 +60,13 @@ module.exports = function(options, done){
 }
 
 function checkOptions(options){
-  if (!options.users) return false
-    if (!options.gallerys) return false
-      if (!options.pics) return false
-        return true
+  if (!options.users)
+    return false
+  if (!options.gallerys)
+    return false
+  if (!options.pics)
+    return false
+  return true
 }
 
 function mockAUser(){
@@ -105,7 +109,7 @@ function mockAPic(userID, username){
   let uri = lorem({count: 5, units: 'word'}).split(' ').join('-')
   let objectKey = lorem({count: 5, units: 'word'}).split(' ').join('')
   let imageURI = `https://${uri}/${objectKey}`
-    let examplePicData = {
+  let examplePicData = {
     name,
     desc,
     userID,
