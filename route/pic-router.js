@@ -14,7 +14,7 @@ const debug = require('debug')('sulgram:pic-router')
 // app module
 const Pic = require('../model/pic.js')
 const Gallery = require('../model/gallery.js')
-const fuzzyQuery = require('../lib/find-fuzzy-query-gen.js')
+const fuzzyQuery = require('../lib/fuzzy-query.js')
 const bearerAuth = require('../lib/bearer-auth-middleware.js')
 const pageQuery = require('../lib/page-query-middleware.js')
 

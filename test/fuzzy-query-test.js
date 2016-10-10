@@ -1,9 +1,9 @@
 'use strict'
 
 const expect = require('chai').expect
-const fuzzyQuery = require('../lib/find-fuzzy-query-gen.js')
+const fuzzyQuery = require('../lib/fuzzy-query.js')
 
-describe('testing module find-fuzzy-query-gen', function(){
+describe('testing module fuzzy-query', function(){
   describe('with valid input', function(){
     let fields = ['name', 'duck']
     let query = {

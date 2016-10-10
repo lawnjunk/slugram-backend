@@ -11,7 +11,7 @@ const Gallery = require('../model/gallery.js')
 const bearerAuth = require('../lib/bearer-auth-middleware.js')
 const pageQueries = require('../lib/page-query-middleware.js')
 const itemQueries = require('../lib/item-query-middleware.js')
-const fuzzyQuery = require('../lib/find-fuzzy-query-gen.js')
+const fuzzyQuery = require('../lib/fuzzy-query.js')
 
 // constants
 const galleryRouter = module.exports = Router()
