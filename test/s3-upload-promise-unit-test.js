@@ -10,7 +10,7 @@ describe('testing s3UploadPromise', function(){
   describe('with valid input', function(){
     it('should return an aws response', done => {
       let params = {
-        Bucket: 'slugram-assets',
+        Bucket: process.env.AWS_BUCKET,
         Key: 'wat',
         Body: 'lul',
         ACL: 'public-read',
@@ -31,7 +31,7 @@ describe('testing s3UploadPromise', function(){
   describe('with no ACL', function(){
     it('should return an error', done => {
       let params = {
-        Bucket: 'slugram-assets',
+        Bucket: process.env.AWS_BUCKET,
         Key: 'wat',
         Body: 'lul',
       }
@@ -48,7 +48,7 @@ describe('testing s3UploadPromise', function(){
   describe('with with no key', function(){
     it('should return an aws response', done => {
       let params = {
-        Bucket: 'slugram-assets',
+        Bucket: process.env.AWS_BUCKET,
         Body: 'lul',
         ACL: 'public-read',
       }
@@ -65,7 +65,7 @@ describe('testing s3UploadPromise', function(){
   describe('with with no body', function(){
     it('should return an aws response', done => {
       let params = {
-        Bucket: 'slugram-assets',
+        Bucket: process.env.AWS_BUCKET,
         Key: 'wat',
         ACL: 'public-read',
       }

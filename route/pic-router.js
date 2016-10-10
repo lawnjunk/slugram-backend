@@ -38,7 +38,7 @@ picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('image')
 
   let params = {
     ACL: 'public-read',
-    Bucket: 'slugram-assets',
+    Bucket: process.env.AWS_BUCKET,
     Key: `${req.file.filename}${ext}`,
     Body: fs.createReadStream(req.file.path),
   }
@@ -110,7 +110,7 @@ picRouter.delete('/api/gallery/:galleryID/pic/:picID', bearerAuth, function(req,
   })
   .then(() => {
     let params = {
-      Bucket: 'slugram-assets',
+      Bucket: process.env.AWS_BUCKET,
       Key: tempPic.objectKey,
     }
     return s3.deleteObject(params).promise() // 500 error
