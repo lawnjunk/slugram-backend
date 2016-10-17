@@ -67,6 +67,7 @@ galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next){
   debug('DELETE /api/gallery/:id')
   let tempGallrey = null
   Gallery.findById(req.params.id)
+  .populate('pics')
   .catch(err => Promise.reject(createError(404, err.message)))
   .then(gallery => {
     tempGallrey = gallery
