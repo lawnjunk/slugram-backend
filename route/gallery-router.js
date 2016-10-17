@@ -1,12 +1,14 @@
 'use strict'
 
 // npm
+const AWS = require('aws-sdk')
 const Router = require('express').Router
 const jsonParser = require('body-parser').json()
 const createError = require('http-errors')
 const debug = require('debug')('slugram:gallery-route')
 
 // app
+const Pic = require('../model/pic.js')
 const Gallery = require('../model/gallery.js')
 const bearerAuth = require('../lib/bearer-auth-middleware.js')
 const pageQueries = require('../lib/page-query-middleware.js')
@@ -14,6 +16,7 @@ const itemQueries = require('../lib/item-query-middleware.js')
 const fuzzyQuery = require('../lib/fuzzy-query.js')
 
 // constants
+const s3 = new AWS.S3()
 const galleryRouter = module.exports = Router()
 
 galleryRouter.post('/api/gallery', bearerAuth, jsonParser, function(req, res, next){
@@ -62,13 +65,27 @@ galleryRouter.put('/api/gallery/:id', bearerAuth, jsonParser, function(req, res,
 
 galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next){
   debug('DELETE /api/gallery/:id')
+  let tempGallrey = null
   Gallery.findById(req.params.id)
   .catch(err => Promise.reject(createError(404, err.message)))
   .then(gallery => {
+    tempGallrey = gallery
     if (gallery.userID.toString() !== req.user._id.toString()) 
       return Promise.reject(createError(401, 'not users gallery'))
-    return gallery.remove()
+    let deletePhotos = []
+
+    gallery.pics.forEach(pic => {
+      let params = {
+        Bucket: process.env.AWS_BUCKET,
+        Key: pic.objectKey,
+      }
+      deletePhotos.push(Pic.findByIdAndRemove(pic._id))
+      deletePhotos.push(s3.deleteObject(params).promise())
+    })
+
+    return Promise.all(deletePhotos)
   })
+  .then(() => tempGallrey.remove()) 
   .then(() => res.sendStatus(204))
   .catch(next)
 })

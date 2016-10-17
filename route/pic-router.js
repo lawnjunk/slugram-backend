@@ -29,7 +29,8 @@ const upload = multer({dest: dataDir })
 const s3UploadPromise = require('../lib/s3-upload-promise.js')
 const picRouter = module.exports = require('express').Router()
 
-picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('image'), function(req, res, next){
+
+picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('file'), function(req, res, next){
   debug('POST /api/gallery/:galleryID/pic')
   if(!req.file)
     return next(createError(400, 'no file found'))
