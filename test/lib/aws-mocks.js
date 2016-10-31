@@ -16,7 +16,7 @@ exports.uploadMock = {
 AWSMock.mock('S3', 'upload', function(params, callback){
   if(params.ACL !== 'public-read')
     return callback(new Error('ACL must be public read'))
-  if(params.Bucket !== 'slugram-assets')
+  if(params.Bucket !== process.env.AWS_BUCKET)
     return callback(new Error('Bucket must be slugram-assets'))
   if(!params.Key)
     return callback(new Error('requres Key'))
@@ -31,7 +31,7 @@ exports.deleteMock = {
 }
 
 AWSMock.mock('S3', 'deleteObject', function(params, callback){
-  if(params.Bucket !== 'slugram-assets')
+  if(params.Bucket !== process.env.AWS_BUCKET)
     return callback(new Error('Bucket must be slugram-assets'))
   if(!params.Key)
     return callback(new Error('requres Key'))

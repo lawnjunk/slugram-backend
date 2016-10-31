@@ -26,7 +26,7 @@ const url = `http://localhost:${process.env.PORT}`
 const examplePic = {
   name: 'sunburn',
   desc: 'owie no thank you',
-  image: `${__dirname}/data/shield.png`,
+  file: `${__dirname}/data/shield.png`,
 }
 
 describe('testing pic-router', function(){
@@ -45,7 +45,7 @@ describe('testing pic-router', function(){
         .set({Authorization: `Bearer ${this.tempToken}`})
         .field('name', examplePic.name)
         .field('desc', examplePic.desc)
-        .attach('image', examplePic.image)
+        .attach('file', examplePic.file)
         .end((err, res) => {
           if (err)
             return done(err)
@@ -65,7 +65,7 @@ describe('testing pic-router', function(){
         request.post(`${url}/api/gallery/${this.tempGallery._id}/pic`)
         .set({Authorization: `Bearer ${this.tempToken}`})
         .field('desc', examplePic.desc)
-        .attach('image', examplePic.image)
+        .attach('file', examplePic.file)
         .end((err, res) => {
           expect(res.status).to.equal(400)
           expect(res.text).to.equal('BadRequestError')
@@ -80,7 +80,7 @@ describe('testing pic-router', function(){
         request.post(`${url}/api/gallery/${this.tempGallery._id}/pic`)
         .set({Authorization: `Bearer ${this.tempToken}`})
         .field('name', examplePic.name)
-        .attach('image', examplePic.image)
+        .attach('file', examplePic.file)
         .end((err, res) => {
           expect(res.status).to.equal(400)
           expect(res.text).to.equal('BadRequestError')
@@ -89,7 +89,7 @@ describe('testing pic-router', function(){
       })
     })
 
-    describe('with no image', function(){
+    describe('with no file', function(){
       before(done => galleryMock.call(this, done))
       it('should respond with status 400', done => {
         request.post(`${url}/api/gallery/${this.tempGallery._id}/pic`)
@@ -111,7 +111,7 @@ describe('testing pic-router', function(){
         .set({Authorization: `Bearer ${this.tempToken}bad`})
         .field('desc', examplePic.desc)
         .field('name', examplePic.name)
-        .attach('image', examplePic.image)
+        .attach('file', examplePic.file)
         .end((err, res) => {
           expect(res.status).to.equal(401)
           expect(res.text).to.equal('UnauthorizedError')
@@ -127,7 +127,7 @@ describe('testing pic-router', function(){
         .set({Authorization: `Bearer ${this.tempToken}`})
         .field('desc', examplePic.desc)
         .field('name', examplePic.name)
-        .attach('image', examplePic.image)
+        .attach('file', examplePic.file)
         .end((err, res) => {
           expect(res.status).to.equal(404)
           expect(res.text).to.equal('NotFoundError')

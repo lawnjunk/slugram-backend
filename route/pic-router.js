@@ -14,7 +14,7 @@ const debug = require('debug')('sulgram:pic-router')
 // app module
 const Pic = require('../model/pic.js')
 const Gallery = require('../model/gallery.js')
-const fuzzyQuery = require('../lib/find-fuzzy-query-gen.js')
+const fuzzyQuery = require('../lib/fuzzy-query.js')
 const bearerAuth = require('../lib/bearer-auth-middleware.js')
 const pageQuery = require('../lib/page-query-middleware.js')
 
@@ -29,7 +29,8 @@ const upload = multer({dest: dataDir })
 const s3UploadPromise = require('../lib/s3-upload-promise.js')
 const picRouter = module.exports = require('express').Router()
 
-picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('image'), function(req, res, next){
+
+picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('file'), function(req, res, next){
   debug('POST /api/gallery/:galleryID/pic')
   if(!req.file)
     return next(createError(400, 'no file found'))
@@ -38,7 +39,7 @@ picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('image')
 
   let params = {
     ACL: 'public-read',
-    Bucket: 'slugram-assets',
+    Bucket: process.env.AWS_BUCKET,
     Key: `${req.file.filename}${ext}`,
     Body: fs.createReadStream(req.file.path),
   }
@@ -110,7 +111,7 @@ picRouter.delete('/api/gallery/:galleryID/pic/:picID', bearerAuth, function(req,
   })
   .then(() => {
     let params = {
-      Bucket: 'slugram-assets',
+      Bucket: process.env.AWS_BUCKET,
       Key: tempPic.objectKey,
     }
     return s3.deleteObject(params).promise() // 500 error
