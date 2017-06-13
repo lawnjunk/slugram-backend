@@ -139,13 +139,13 @@ describe('testing auth-router', function(){
         })
       })
     })
-    
+
     describe('with password.length < 8', function(){
       it('should respond with status 400', (done) => {
         request.post(`${url}/api/signup`)
         .send({
           email: exampleUser.email,
-          password: '124567', 
+          password: '124567',
           username: exampleUser.username,
         })
         .end((err, res) => {
